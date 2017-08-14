@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="VoiceStyle">
+        <attr name="voice_bg" format="reference"/>
+        <attr name="voice_circle_color_1" format="color"/>
+        <attr name="voice_circle_color_2" format="color"/>
+        <attr name="voice_circle_color_3" format="color"/>
+    </declare-styleable>
+</resources>

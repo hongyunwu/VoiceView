@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:clipChildren="false"
+    tools:context="com.why.voicedemo.MainActivity">
+
+    <com.why.voicedemo.VoiceView
+        android:layout_width="300px"
+        android:layout_height="300px"
+        android:layout_centerInParent="true"
+        app:voice_bg="@drawable/voice"
+        app:voice_circle_color_1="@color/voice_color_1"
+        app:voice_circle_color_2="@color/voice_color_2"
+        app:voice_circle_color_3="@color/voice_color_3"
+        />
+
+</RelativeLayout>
