@@ -9,8 +9,8 @@
     tools:context="com.why.voicedemo.MainActivity">
 
     <com.why.voicedemo.VoiceView
-        android:layout_width="300px"
-        android:layout_height="300px"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_centerInParent="true"
         app:voice_bg="@drawable/voice"
         app:voice_circle_color_1="@color/voice_color_1"
