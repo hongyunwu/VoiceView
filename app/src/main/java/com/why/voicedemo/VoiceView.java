@@ -84,7 +84,7 @@ public class VoiceView extends View {
     private float shift;
     private ValueAnimator normal_animator;
     private boolean needChangeColor;
-    private int current_state = SEARCH_STATE;
+    private int current_state = INITIAL_STATE;
     private int normal_duration = 800;
     private float initial_radius = 5;
     private Drawable voiceDrawable;
@@ -106,6 +106,9 @@ public class VoiceView extends View {
     private float search_scale_size_2;
     private float mSearchDegree;
     private ValueAnimator rotateSearchAnimator;
+    private ValueAnimator preSearchAnimator;
+    private long pre_search_duration = 2000;
+    private float mPreSearchRadius;
 
     public VoiceView(Context context) {
         this(context,null);
@@ -145,6 +148,61 @@ public class VoiceView extends View {
         drawVoice(canvas);
         drawThreeCircle(canvas, shift,mDefaultRadius+shift/2,mDefaultRadius+shift/2,mDefaultRadius+shift/2);
         drawEightCircle(canvas);
+        drawFourCircle(canvas);
+    }
+
+    private void drawFourCircle(Canvas canvas) {
+        if (current_state==PRE_SEARCH_STATE){
+            //需要一個渐显的圆和三个逐渐缩小的圆
+            //mDegree shift值获取当前位置，目标位置
+            LinearGradient linearGradient1 = new LinearGradient(
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.sin(mDegree)*mPreSearchRadius),
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI)*mPreSearchRadius),
+                    Color.GRAY, Color.BLUE, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient1);
+            mDefaultPaint.setColor(getThreeColor(0));
+            canvas.drawCircle(
+                        (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
+                        (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))),
+                        mPreSearchRadius,mDefaultPaint);
+            LinearGradient linearGradient2 = new LinearGradient(
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*3/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI/2)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*3/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.sin(mDegree+Math.PI/2)*mPreSearchRadius),
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*3/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI*3/2)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*3/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI*3/2)*mPreSearchRadius),
+                    Color.YELLOW, Color.CYAN, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient2);
+            canvas.drawCircle(
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*3/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*3/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
+                    mPreSearchRadius,mDefaultPaint);
+            LinearGradient linearGradient3 = new LinearGradient(
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*5/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*5/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.sin(mDegree+Math.PI)*mPreSearchRadius),
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*5/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI*2)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*5/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI*2)*mPreSearchRadius),
+                    Color.GRAY, Color.BLUE, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient3);
+            canvas.drawCircle(
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*5/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*5/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
+                    mPreSearchRadius,mDefaultPaint);
+            LinearGradient linearGradient4 = new LinearGradient(
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI/2)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.sin(mDegree+Math.PI/2)*mPreSearchRadius),
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI*3/2)*mPreSearchRadius),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius+shift/2 - search_lessen_size)))) + (float) (Math.cos(mDegree+Math.PI*3/2)*mPreSearchRadius),
+                    Color.LTGRAY, Color.MAGENTA, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient4);
+            canvas.drawCircle(
+                    (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
+                    (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
+                    mPreSearchRadius,mDefaultPaint);
+            Log.i(TAG,"drawFourCircle->shift"+shift);
+            mDefaultPaint.setShader(null);
+        }
 
     }
 
@@ -154,90 +212,93 @@ public class VoiceView extends View {
      * @param canvas
      */
     private void drawEightCircle(Canvas canvas) {
-        mDefaultPaint.setColor(getThreeColor(0));
-        /***************************************************/
-        LinearGradient linearGradient1 = new LinearGradient(
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree)*search_scale_size_1),
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI)*search_scale_size_1),
-                Color.GRAY, Color.BLUE, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient1);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*1/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*1/4)*mDefaultRadius)
-                , search_scale_size_1
-                ,mDefaultPaint);
-        LinearGradient linearGradient2 = new LinearGradient(
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree+Math.PI)*search_scale_size_1),
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*2)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*2)*search_scale_size_1),
-                Color.GRAY, Color.BLUE, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient2);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*5/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*5/4)*mDefaultRadius)
-                , search_scale_size_1
-                ,mDefaultPaint);
-        mDefaultPaint.setShader(null);
-        /***************************************************/
-        LinearGradient linearGradient3 = new LinearGradient(
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI/2)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree+Math.PI/2)*search_scale_size_1),
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
-                Color.YELLOW, Color.CYAN, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient3);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*3/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*3/4)*mDefaultRadius)
-                , search_scale_size_1
-                ,mDefaultPaint);
-        LinearGradient linearGradient4 = new LinearGradient(
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI/2)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree+Math.PI/2)*search_scale_size_1),
-                measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
-                measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
-                Color.LTGRAY, Color.MAGENTA, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient4);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*7/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*7/4)*mDefaultRadius)
-                , search_scale_size_1
-                ,mDefaultPaint);
-        mDefaultPaint.setShader(null);
-        /***************************************************/
-        LinearGradient linearGradient5 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
-                 - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*4/4)*mDefaultRadius) + search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
-                +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*4/4)*mDefaultRadius) -search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient5);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
-                , search_scale_size_2
-                ,mDefaultPaint);
-        LinearGradient linearGradient6 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
-                - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*6/4)*mDefaultRadius) + search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
-                +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*6/4)*mDefaultRadius) - search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient6);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
-                , search_scale_size_2
-                ,mDefaultPaint);
-        LinearGradient linearGradient7 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
-                - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*2/4)*mDefaultRadius) +search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
-                +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*2/4)*mDefaultRadius) - search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient7);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
-                , search_scale_size_2
-                ,mDefaultPaint);
-        LinearGradient linearGradient8 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
-                - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*8/4)*mDefaultRadius)+search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
-                +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*8/4)*mDefaultRadius) - search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
-        mDefaultPaint.setShader(linearGradient8);
-        canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
-                ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
-                , search_scale_size_2
-                ,mDefaultPaint);
-        mDefaultPaint.setShader(null);
-        Log.i(TAG,"drawEightCircle->mSearchDegree:"+mSearchDegree);
+        if (current_state ==SEARCH_STATE){
+            mDefaultPaint.setColor(getThreeColor(0));
+            /***************************************************/
+            LinearGradient linearGradient1 = new LinearGradient(
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree)*search_scale_size_1),
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*1/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI)*search_scale_size_1),
+                    Color.GRAY, Color.BLUE, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient1);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*1/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*1/4)*mDefaultRadius)
+                    , search_scale_size_1
+                    ,mDefaultPaint);
+            LinearGradient linearGradient2 = new LinearGradient(
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree+Math.PI)*search_scale_size_1),
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*2)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*5/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*2)*search_scale_size_1),
+                    Color.GRAY, Color.BLUE, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient2);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*5/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*5/4)*mDefaultRadius)
+                    , search_scale_size_1
+                    ,mDefaultPaint);
+            mDefaultPaint.setShader(null);
+            /***************************************************/
+            LinearGradient linearGradient3 = new LinearGradient(
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI/2)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree+Math.PI/2)*search_scale_size_1),
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*3/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
+                    Color.YELLOW, Color.CYAN, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient3);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*3/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*3/4)*mDefaultRadius)
+                    , search_scale_size_1
+                    ,mDefaultPaint);
+            LinearGradient linearGradient4 = new LinearGradient(
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI/2)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.sin(mSearchDegree+Math.PI/2)*search_scale_size_1),
+                    measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
+                    measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*7/4)*mDefaultRadius) + (float) (Math.cos(mSearchDegree+Math.PI*3/2)*search_scale_size_1),
+                    Color.LTGRAY, Color.MAGENTA, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient4);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*7/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*7/4)*mDefaultRadius)
+                    , search_scale_size_1
+                    ,mDefaultPaint);
+            mDefaultPaint.setShader(null);
+            /***************************************************/
+            LinearGradient linearGradient5 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
+                    - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*4/4)*mDefaultRadius) + search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
+                    +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*4/4)*mDefaultRadius) -search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient5);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*4/4)*mDefaultRadius)
+                    , search_scale_size_2
+                    ,mDefaultPaint);
+            LinearGradient linearGradient6 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
+                    - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*6/4)*mDefaultRadius) + search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
+                    +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*6/4)*mDefaultRadius) - search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient6);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*6/4)*mDefaultRadius)
+                    , search_scale_size_2
+                    ,mDefaultPaint);
+            LinearGradient linearGradient7 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
+                    - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*2/4)*mDefaultRadius) +search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
+                    +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*2/4)*mDefaultRadius) - search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient7);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*2/4)*mDefaultRadius)
+                    , search_scale_size_2
+                    ,mDefaultPaint);
+            LinearGradient linearGradient8 = new LinearGradient(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
+                    - search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*8/4)*mDefaultRadius)+search_scale_size_2/2, measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
+                    +search_scale_size_2, measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*8/4)*mDefaultRadius) - search_scale_size_2/2, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
+            mDefaultPaint.setShader(linearGradient8);
+            canvas.drawCircle(measuredWidth/2+(float) (Math.cos(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
+                    ,measuredHeight/2+(float) (Math.sin(mSearchDegree+Math.PI*8/4)*mDefaultRadius)
+                    , search_scale_size_2
+                    ,mDefaultPaint);
+            mDefaultPaint.setShader(null);
+            Log.i(TAG,"drawEightCircle->mSearchDegree:"+mSearchDegree);
+        }
+
     }
 
     /**
@@ -290,7 +351,7 @@ public class VoiceView extends View {
             Log.i(TAG,"drawVoice->larger:"+initialLargerRadius+",lessen:"+initialLessenRadius+",default:"+mDefaultRadius);
 
         }
-        if (current_state==SEARCH_STATE){
+        if (current_state==SEARCH_STATE||current_state == PRE_SEARCH_STATE){
 
             canvas.drawBitmap(drawableToBitmap(voiceDrawable),measuredWidth/2 - voiceDrawable.getIntrinsicWidth()/2,measuredHeight/2 - voiceDrawable.getIntrinsicHeight()/2,mDefaultPaint);
         }
@@ -334,6 +395,7 @@ public class VoiceView extends View {
      */
     private void drawThreeCircle(Canvas canvas,float shift,float circle_1_radius,float circle_2_radius,float circle_3_radius) {
         if (current_state == NORMAL_STATE){
+
             mDefaultPaint.setColor(getThreeColor(0));
             canvas.drawCircle((float) (measuredWidth/2 + Math.cos(mDegree+Math.PI/2)*shift/2), (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI/2)*shift/2),circle_1_radius,mDefaultPaint);
 
@@ -412,10 +474,12 @@ public class VoiceView extends View {
                     }
                 });
                 rotateAnimator.start();
+            }else if (!rotateAnimator.isRunning()){
+                rotateAnimator.start();
             }
         }else if(current_state == SEARCH_STATE){
             if (rotateSearchAnimator==null){
-                rotateSearchAnimator = ValueAnimator.ofFloat(0, (float) Math.PI*2);
+                rotateSearchAnimator = ValueAnimator.ofFloat(mDegree, (float) Math.PI*2+mDegree);
                 rotateSearchAnimator.setRepeatCount(-1);
                 rotateSearchAnimator.setDuration(normal_duration*8);
                 rotateSearchAnimator.setRepeatMode(ValueAnimator.RESTART);
@@ -523,8 +587,11 @@ public class VoiceView extends View {
                     @Override
                     public void onAnimationRepeat(Animator animation) {
                         //changeThreeColor();
+                        current_state = PRE_SEARCH_STATE;
                     }
                 });
+            }else if (!normal_animator.isRunning()){
+                normal_animator.start();
             }
 
         } else if (current_state==SEARCH_STATE){
@@ -558,10 +625,57 @@ public class VoiceView extends View {
             }
 
 
-        }else{
-            if (normal_animator !=null){
-                normal_animator.cancel();
+        }else if(current_state == PRE_SEARCH_STATE){//当状态为抬起状态时，
+            //需要暂停动画,暂停时就可以获得mDegree和shift值，据此可以得到三个圆的圆心
+            if (rotateAnimator!=null&&rotateAnimator.isRunning()){
+                rotateAnimator.pause();
             }
+            if (normal_animator!=null&& normal_animator.isRunning()){
+                normal_animator.pause();
+            }
+            //
+            if (preSearchAnimator==null&&mDefaultRadius!=0){
+
+                Log.i(TAG,"computeScroll->"+mDefaultRadius);
+                preSearchAnimator = ValueAnimator.ofFloat(mDefaultRadius + shift / 2, search_lessen_size);
+                preSearchAnimator.setDuration(pre_search_duration);
+                preSearchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        mPreSearchRadius = (float)animation.getAnimatedValue();
+
+                    }
+                });
+                preSearchAnimator.setRepeatCount(0);
+                preSearchAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        current_state = SEARCH_STATE;
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+                preSearchAnimator.start();
+            }/*else if (preSearchAnimator!=null&&!preSearchAnimator.isRunning()){
+                preSearchAnimator.start();
+            }*/
+
+        }else{
+
+
         }
         super.computeScroll();
         postInvalidate();
