@@ -6,5 +6,8 @@
         <attr name="voice_circle_color_1" format="color"/>
         <attr name="voice_circle_color_2" format="color"/>
         <attr name="voice_circle_color_3" format="color"/>
+        <attr name="voice_circle_shadow_width" format="dimension"/>
+        <attr name="voice_search_circle_large_width" format="dimension"/>
+        <attr name="voice_search_circle_small_width" format="dimension"/>
     </declare-styleable>
 </resources>

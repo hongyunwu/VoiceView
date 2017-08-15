@@ -11,11 +11,15 @@
     <com.why.voicedemo.VoiceView
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:id="@+id/voice_view"
         android:layout_centerInParent="true"
         app:voice_bg="@drawable/voice"
         app:voice_circle_color_1="@color/voice_color_1"
         app:voice_circle_color_2="@color/voice_color_2"
         app:voice_circle_color_3="@color/voice_color_3"
+        app:voice_circle_shadow_width="12dp"
+        app:voice_search_circle_large_width="18dp"
+        app:voice_search_circle_small_width="8dp"
         />
 
 </RelativeLayout>
