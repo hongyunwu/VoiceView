@@ -1,4 +1,4 @@
-package com.why.voicedemo;
+package com.autoio.voice_view;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -13,7 +13,6 @@ import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -124,11 +123,11 @@ public class VoiceView extends View {
         this(context,null);
     }
 
-    public VoiceView(Context context, @Nullable AttributeSet attrs) {
+    public VoiceView(Context context,  AttributeSet attrs) {
         this(context, attrs,0);
     }
 
-    public VoiceView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public VoiceView(Context context,  AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         mDefaultPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -139,6 +138,7 @@ public class VoiceView extends View {
         search_lessen_size = typedArray.getDimensionPixelSize(R.styleable.VoiceStyle_voice_search_circle_small_width,8);
         search_larger_size = typedArray.getDimensionPixelSize(R.styleable.VoiceStyle_voice_search_circle_large_width,18);
         typedArray.recycle();
+        setClickable(false);
 
     }
 
@@ -380,7 +380,7 @@ public class VoiceView extends View {
         if (current_state==INITIAL_STATE){
             mDefaultPaint.setAlpha((int) (initial_radius/mDefaultRadius*255));
         }
-        if (current_state==INITIAL_STATE||current_state==NORMAL_STATE||current_state == END_SEARCH_STATE){
+        if (current_state == PRESSED_STATE||current_state==INITIAL_STATE||current_state==NORMAL_STATE||current_state == END_SEARCH_STATE){
             mDefaultPaint.setColor(Color.WHITE);
             RadialGradient radialGradient = new RadialGradient(measuredWidth / 2
                     , measuredHeight / 2,mDefaultRadius-shift/10+voice_shadow_width
@@ -426,14 +426,14 @@ public class VoiceView extends View {
         if (current_state == INITIAL_STATE){
 
             mDefaultPaint.setColor(getThreeColor(0));
-            canvas.drawCircle((float) (measuredWidth/2 + Math.cos(Math.PI/2)*shift/2), (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI/2)*shift/2),initialLargerRadius,mDefaultPaint);
+            canvas.drawCircle((float) (measuredWidth/2 + Math.cos(mDegree+Math.PI/2)*shift/2), (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI/2)*shift/2),initialLargerRadius,mDefaultPaint);
 
             mDefaultPaint.setColor(getThreeColor(1));
             //shift开根号
-            canvas.drawCircle((float) (measuredWidth/2 + Math.cos(Math.PI*7/6)*shift/2),(float)( measuredHeight/2 + Math.sin(mDegree+Math.PI*7/6)*shift/2), initialLessenRadius,mDefaultPaint);
+            canvas.drawCircle((float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*7/6)*shift/2),(float)( measuredHeight/2 + Math.sin(mDegree+Math.PI*7/6)*shift/2), initialLessenRadius,mDefaultPaint);
 
             mDefaultPaint.setColor(getThreeColor(2));
-            canvas.drawCircle((float) (measuredWidth/2 + Math.cos(Math.PI*11/6)*shift/2),(float)( measuredHeight/2 + Math.sin(mDegree+Math.PI*11/6)*shift/2), initialLessenRadius,mDefaultPaint);
+            canvas.drawCircle((float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*11/6)*shift/2),(float)( measuredHeight/2 + Math.sin(mDegree+Math.PI*11/6)*shift/2), initialLessenRadius,mDefaultPaint);
             Log.i(TAG,"drawVoiceCircle->larger:"+initialLargerRadius+",lessen:"+initialLessenRadius+",default:"+mDefaultRadius);
 
         }
@@ -441,6 +441,7 @@ public class VoiceView extends View {
             //(lar+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)
             mDefaultPaint.setColor(Color.WHITE);
             mDefaultPaint.setAlpha((int) (Math.sqrt((mPreSearchRadius - search_lessen_size)/(mDefaultRadius +shift/2- search_lessen_size))*255));
+            Log.i(TAG,"mDefaultRadius:"+mDefaultRadius+",shift:"+shift+",voice_shadow_width:"+voice_shadow_width+",mPreSearchRadius:"+mPreSearchRadius+",search_lessen_size:"+search_lessen_size);
             RadialGradient radialGradient = new RadialGradient(measuredWidth / 2
                     , measuredHeight / 2,(mDefaultRadius- shift/10+voice_shadow_width)*(mPreSearchRadius - search_lessen_size)/(mDefaultRadius +shift/2- search_lessen_size)
                     ,new int[]{Color.WHITE
@@ -514,7 +515,7 @@ public class VoiceView extends View {
      * @param canvas
      */
     private void drawThreeCircle(Canvas canvas,float shift,float circle_1_radius,float circle_2_radius,float circle_3_radius) {
-        if (current_state == NORMAL_STATE){
+        if (current_state == NORMAL_STATE||current_state == PRESSED_STATE){
 
             mDefaultPaint.setColor(getThreeColor(0));
             canvas.drawCircle((float) (measuredWidth/2 + Math.cos(mDegree+Math.PI/2)*shift/2), (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI/2)*shift/2),circle_1_radius,mDefaultPaint);
@@ -579,6 +580,11 @@ public class VoiceView extends View {
      */
     @Override
     public void computeScroll() {
+        if (current_state!=NORMAL_STATE){
+            setClickable(false);
+        }else{
+            setClickable(true);
+        }
         if (current_state == INITIAL_STATE ||current_state == NORMAL_STATE){
             if (rotateAnimator==null){
                 rotateAnimator = ValueAnimator.ofFloat(0, (float) Math.PI*2);
@@ -736,6 +742,7 @@ public class VoiceView extends View {
                         //changeThreeColor();
                     }
                 });
+
             }else if (normal_animator.isPaused()){
                 normal_animator.resume();
             }
@@ -763,6 +770,27 @@ public class VoiceView extends View {
                     public void onAnimationUpdate(ValueAnimator animation) {
                         search_scale_size_2 = (Float) animation.getAnimatedValue();
 
+                    }
+                });
+                searchScaleAnimator2.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+                        current_state = END_SEARCH_STATE;
                     }
                 });
                 searchScaleAnimator2.setStartDelay(normal_duration);
@@ -815,9 +843,7 @@ public class VoiceView extends View {
                     }
                 });
                 preSearchAnimator.start();
-            }/*else if (preSearchAnimator!=null&&!preSearchAnimator.isRunning()){
-                preSearchAnimator.start();
-            }*/
+            }
 
         }else if(current_state == END_SEARCH_STATE){//查询结束
             //需要先暂停search_state的状态
@@ -925,6 +951,25 @@ public class VoiceView extends View {
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+
+                break;
+            case MotionEvent.ACTION_MOVE:
+                current_state = PRESSED_STATE;
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                preSearchAnimator = null;
+                endSearchScaleAnimator1 =null;
+                endSearchScaleAnimator2 = null;
+                current_state = PRE_SEARCH_STATE;
+                break;
+
+
+        }
+
+
         return super.onTouchEvent(event);
     }
 
